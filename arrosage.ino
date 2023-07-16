@@ -10,7 +10,7 @@ void setup() {
   while (!Serial);
   settings_load();
   net_start();
-  time_start();
+  time_init();
   gui_start();
 }
 

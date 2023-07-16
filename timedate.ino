@@ -1,10 +1,12 @@
 #include <time.h>
+#include <esp_sntp.h>
 
-const char* ntpServer = "pool.ntp.org";
-const long  gmtOffset_sec = 0;
-const int   daylightOffset_sec = 3600;
+const char* ntp_server = "pool.ntp.org";
+const long gmt_offset_sec = 0;
+const int daylight_offset_sec = 3600;
 
-void printLocalTime(){
+void time_print()
+{
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)){
     Serial.println("Failed to get time !");
@@ -13,10 +15,19 @@ void printLocalTime(){
   Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
 }
 
-void time_start(void)
+void time_synced_cb(struct timeval *tv)
 {
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-  printLocalTime();
+  Serial.println(F("NTP time synched"));
+}
+
+void time_init(void)
+{
+  sntp_set_sync_interval(24 * 60 * 60 * 1000UL); // time sync every 24 hours
+  sntp_set_time_sync_notification_cb(time_synced_cb);
+  configTime(gmt_offset_sec, daylight_offset_sec, ntp_server);
+  setenv("TZ", TIMEZONE, 1);
+  tzset();
+  time_print();
 }
 
 String time_get_formatted(void)
@@ -29,4 +40,16 @@ String time_get_formatted(void)
   char buffer[50];
   strftime(buffer, sizeof(buffer), "%A, %B %d %Y %H:%M:%S", &timeinfo);
   return String(buffer);
+}
+
+bool time_get(int *hour, int *minute)
+{
+  struct tm timeinfo;
+  if (!getLocalTime(&timeinfo)){
+    Serial.println("Failed to get time !");
+    return false;
+  }
+  *hour = timeinfo.tm_hour;
+  *minute = timeinfo.tm_min;
+  return true;
 }

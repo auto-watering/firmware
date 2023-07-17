@@ -17,7 +17,7 @@ void time_print()
 
 void time_synced_cb(struct timeval *tv)
 {
-  Serial.println(F("NTP time synched"));
+  Serial.println(F("NTP time synchronized"));
 }
 
 void time_init(void)

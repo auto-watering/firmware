@@ -52,22 +52,20 @@ void gui_duration_cb(Control *sender, int type, void* user_data)
 
 void gui_force_on(int id, bool enable)
 {
-  settings_set_valve_force_on(id, enable);
   ESPUI.setEnabled(gui_elements_valve[id].force_off_ctrl, !enable);
-  gui_status_change(id, enable);
   ESPUI.updateControlValue(gui_elements_valve[id].force_on_ctrl, String(enable));
   ESPUI.updateControlValue(gui_elements_valve[id].force_off_ctrl, "0");
   settings_set_valve_force_on(id, enable);
+  settings_set_valve_force_off(id, false);
 }
 
 void gui_force_off(int id, bool enable)
 {
-  settings_set_valve_force_off(id, enable);
   ESPUI.setEnabled(gui_elements_valve[id].force_on_ctrl, !enable);
-  gui_status_change(id, false);
   ESPUI.updateControlValue(gui_elements_valve[id].force_off_ctrl, String(enable));
   ESPUI.updateControlValue(gui_elements_valve[id].force_on_ctrl, "0");
   settings_set_valve_force_off(id, enable);
+  settings_set_valve_force_on(id, false);
 }
 
 void gui_force_on_cb(Control *sender, int type, void* user_data)
@@ -98,7 +96,7 @@ void gui_force_off_cb(Control *sender, int type, void* user_data)
   gui_force_off(id, enabled);
 }
 
-void gui_force_on(bool enable)
+void gui_general_force_on(bool enable)
 {
   Serial.print("General force ON ");
   if (enable) {
@@ -115,7 +113,7 @@ void gui_force_on(bool enable)
   ESPUI.setEnabled(gui_elements.general_force_off_ctrl, !enable);
 }
 
-void gui_force_off(bool enable)
+void gui_general_force_off(bool enable)
 {
   Serial.print("General force OFF ");
   if (enable) {
@@ -135,18 +133,29 @@ void gui_force_off(bool enable)
 void gui_general_force_on_cb(Control *sender, int type)
 {
   bool enable = sender->value.toInt();
-  gui_force_on(enable);
+  gui_general_force_on(enable);
 }
 
 void gui_general_force_off_cb(Control *sender, int type)
 {
   bool enable = sender->value.toInt();
-  gui_force_off(enable);
+  gui_general_force_off(enable);
 }
 
 void gui_set_date(String date)
 {
-    ESPUI.updateControlValue(gui_elements.date_label, date);
+  ESPUI.updateLabel(gui_elements.date_label, date);
+}
+
+void gui_refresh(String date, bool valves_state[VALVE_NUMBER])
+{ 
+  // Date
+  gui_set_date(date);
+
+  for (int i = 0; i < VALVE_NUMBER; i++) {
+    // Status
+    gui_status_change(i, valves_state[i]);
+  }
 }
 
 void gui_start(void)
@@ -169,7 +178,7 @@ void gui_start(void)
   gui_elements.general_force_off_ctrl = ESPUI.addControl(Switcher, "", value, ControlColor::Peterriver, gui_elements.general_manual_grp, gui_general_force_off_cb);
 
   // Date
-  gui_elements.date_label = ESPUI.addControl(Label, "Date", "", ControlColor::Peterriver, Control::noParent);
+  gui_elements.date_label = ESPUI.addControl(Label, "Heure", "", ControlColor::Peterriver, Control::noParent);
   ESPUI.setElementStyle(gui_elements.date_label, labelStyle);
 
   for (int i = 0; i < VALVE_NUMBER; i++) {
@@ -207,9 +216,9 @@ void gui_start(void)
 
   // Check general control status
   if (settings_get_general_force_off()) {
-    gui_force_off(true);
+    gui_general_force_off(true);
   } else if (settings_get_general_force_on()) {
-    gui_force_on(true);
+    gui_general_force_on(true);
   }
   
   ESPUI.begin("Arrosage automatique");

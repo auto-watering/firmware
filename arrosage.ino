@@ -4,6 +4,7 @@
 #include "timedate.h"
 #include "settings.h"
 #include "gui.h"
+#include "valves.h"
 
 void setup() {
   Serial.begin(115200);
@@ -12,10 +13,12 @@ void setup() {
   net_start();
   time_init();
   gui_start();
+  valves_init();
 }
 
 void loop() {
-  gui_set_date(time_get_formatted());
+  valves_update();
+  gui_refresh(time_get_formatted(), get_valves_state());
   if (settings_changed()) {
     settings_store();
   }

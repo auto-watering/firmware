@@ -12,16 +12,20 @@ void valve_set(uint16_t id, bool open)
   Serial.print("Valve ");
   Serial.print(id);
   if (open) {
+    digitalWrite(VALVE_GPIO[id], HIGH);
     Serial.println(" opened");
-    // TODO
   } else {
+    digitalWrite(VALVE_GPIO[id], LOW);
     Serial.println(" closed");
-    // TODO
   }
 }
 
 void valves_init(void)
 {
+  for (int i = 0; i < VALVE_NUMBER; i++) {
+    pinMode(VALVE_GPIO[i], OUTPUT);
+    digitalWrite(VALVE_GPIO[i], LOW);
+  }
   memset(valves_state, 0, sizeof(valves_state));
   valves_update();
 }

@@ -28,6 +28,8 @@ void valves_init(void);
 
 /**
  * Update valves states according to settings and current time.
+ * Only one valve is opened on each call, to limit power supply power call.
+ * So, if several valves are to be opened at the same time, the call must be repeated after a short delay.
  */
 void valves_update(void);
 

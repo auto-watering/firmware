@@ -22,8 +22,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 bool valves_state[VALVE_NUMBER];
 
-void valve_set(uint16_t id, bool open)
+void valve_set(uint16_t id, bool open, bool *opened)
 {
+  *opened = 0;
   if (valves_state[id] == open) {
     return;
   }
@@ -33,6 +34,7 @@ void valve_set(uint16_t id, bool open)
   if (open) {
     digitalWrite(VALVE_GPIO[id], HIGH);
     Serial.println(" opened");
+    *opened = 1;
   } else {
     digitalWrite(VALVE_GPIO[id], LOW);
     Serial.println(" closed");
@@ -81,19 +83,26 @@ void valves_update(void)
 {
   bool general_force_on = settings_get_general_force_on();
   bool general_force_off = settings_get_general_force_off();
+  bool opened;
   
   if (general_force_on || general_force_off) {
     for (int i = 0; i < VALVE_NUMBER; i++) {
-      valve_set(i, general_force_on);
+      valve_set(i, general_force_on, &opened);
+      if (opened) {
+        return; // open only one valve at a time
+      }
     }
   } else {
     for (int i = 0; i < VALVE_NUMBER; i++) {
       bool force_on = settings_get_valve_force_on(i);
       bool force_off = settings_get_valve_force_off(i);
       if (force_on || force_off) {
-        valve_set(i, force_on);
+        valve_set(i, force_on, &opened);
       } else {
-        valve_set(i, valve_is_scheduled_time_now(i));
+        valve_set(i, valve_is_scheduled_time_now(i), &opened);
+      }
+      if (opened) {
+        return; // open only one valve at a time
       }
     }
   }

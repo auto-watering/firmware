@@ -1,2 +1,5 @@
+1.0.1 - 08/03/2023
+- Only one valve is opened at the same time, to limit power supply power call
+
 1.0.0 - 07/30/2023
 - First release

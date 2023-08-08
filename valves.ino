@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "settings.h"
 
 bool valves_state[VALVE_NUMBER];
+int current_cycle = -1;
 
 void valve_set(uint16_t id, bool open, bool *opened)
 {
@@ -80,10 +81,12 @@ int get_now_scheduled_valve(void)
       duration_sum += duration;
       stop_ts += duration_sum * 60;
       if (start_ts <= now_ts && now_ts < stop_ts) {
+        current_cycle = i;
         return j;
       }
     }
   }
+  current_cycle = -1;
   return -1;
 }
 
@@ -121,4 +124,12 @@ void valves_update(void)
 bool *get_valves_state(void)
 {
   return valves_state;
+}
+
+int get_current_cycle(void)
+{
+  if (settings_get_general_force_off()) {
+    return -1;
+  }
+  return current_cycle;
 }

@@ -39,4 +39,10 @@ void valves_update(void);
  */
 bool *get_valves_state(void);
 
+/**
+ * Get current watering cycle.
+ * @return cycle ID, or -1 if none currently active.
+ */
+int get_current_cycle(void);
+
 #endif

@@ -35,11 +35,15 @@ typedef struct gui_elements_s {
   uint16_t general_force_off_ctrl;
   uint16_t schedule_grp, general_manual_grp;
   uint16_t date_label;
+  uint16_t status_label;
+  String status_str;
 } gui_elements_t;
 gui_elements_t gui_elements;
 
 void gui_status_change(int id, bool status)
 {
+  int current_cycle;
+  
   if (status) {
     ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Emerald;
     ESPUI.updateControlValue(gui_elements_valve[id].status_label, "ON");
@@ -47,6 +51,17 @@ void gui_status_change(int id, bool status)
     ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Alizarin;
     ESPUI.updateControlValue(gui_elements_valve[id].status_label, "OFF");
   }
+  
+  current_cycle = get_current_cycle();
+  if (current_cycle != -1) {
+    ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Emerald;
+    gui_elements.status_str = "Cycle " + String(current_cycle + 1) + " en cours";
+  } else {
+    ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Alizarin;
+    gui_elements.status_str = "Aucun cycle en cours";
+  }
+  ESPUI.updateControlValue(gui_elements.status_label, gui_elements.status_str);
+
 }
 
 void gui_start_time_cb(Control *sender, int type, void* user_data)
@@ -199,7 +214,7 @@ void gui_start(void)
     elt = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.schedule_grp, gui_start_time_enable_cb, (void*)i);
     
     // label
-    gui_elements.start_time_str[i] = "Heure d'activation " + String(i + 1);
+    gui_elements.start_time_str[i] = "Cycle " + String(i + 1);
     elt = ESPUI.addControl(Label, "", gui_elements.start_time_str[i].c_str(), ControlColor::None, gui_elements.schedule_grp);
     ESPUI.setElementStyle(elt, label_style);
     
@@ -217,6 +232,11 @@ void gui_start(void)
   gui_elements.general_manual_grp = elt;
   value = String(settings_get_general_force_off());
   gui_elements.general_force_off_ctrl = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.general_manual_grp, gui_general_force_off_cb);
+
+  // General status
+  gui_elements.status_str = "Aucun cycle en cours";
+  gui_elements.status_label = ESPUI.addControl(Label, "Cycle actif", gui_elements.status_str, ControlColor::Alizarin, Control::noParent);
+  ESPUI.setElementStyle(gui_elements.status_label, label_style);
 
   // Valves settings
   for (int i = 0; i < VALVE_NUMBER; i++) {

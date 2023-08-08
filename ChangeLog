@@ -1,3 +1,10 @@
+1.1.0 - 08/08/2023
+- Now using global start times, defining cycles start, to be able to have several cycles per day
+- Add current cycle information in GUI
+- GUI internationalization
+- Initialize valves at the early begining
+- Add dist script
+
 1.0.1 - 08/03/2023
 - Only one valve is opened at the same time, to limit power supply power call
 

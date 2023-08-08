@@ -28,11 +28,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 void setup() {
   Serial.begin(115200);
   while (!Serial);
+  valves_init();
   settings_load();
   net_start();
   time_init();
   gui_start();
-  valves_init();
 }
 
 void loop() {

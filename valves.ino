@@ -48,7 +48,6 @@ void valves_init(void)
     digitalWrite(VALVE_GPIO[i], LOW);
   }
   memset(valves_state, 0, sizeof(valves_state));
-  valves_update();
 }
 
 int get_now_scheduled_valve(void)

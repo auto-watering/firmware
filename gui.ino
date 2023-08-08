@@ -18,8 +18,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include <ESPUI.h>
-
 #include "config.h"
+#include "i18n.h"
 
 typedef struct gui_elements_valve_s {
   String valve_str;
@@ -46,19 +46,19 @@ void gui_status_change(int id, bool status)
   
   if (status) {
     ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Emerald;
-    ESPUI.updateControlValue(gui_elements_valve[id].status_label, "ON");
+    ESPUI.updateControlValue(gui_elements_valve[id].status_label, gettext("ON"));
   } else {
     ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Alizarin;
-    ESPUI.updateControlValue(gui_elements_valve[id].status_label, "OFF");
+    ESPUI.updateControlValue(gui_elements_valve[id].status_label, gettext("OFF"));
   }
   
   current_cycle = get_current_cycle();
   if (current_cycle != -1) {
     ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Emerald;
-    gui_elements.status_str = "Cycle " + String(current_cycle + 1) + " en cours";
+    gui_elements.status_str = gettext("Cycle ") + String(current_cycle + 1) + gettext(" in progress");
   } else {
     ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Alizarin;
-    gui_elements.status_str = "Aucun cycle en cours";
+    gui_elements.status_str = gettext("No active cycle");
   }
   ESPUI.updateControlValue(gui_elements.status_label, gui_elements.status_str);
 
@@ -199,7 +199,7 @@ void gui_start(void)
 
   // Schedule
   // current date
-  gui_elements.date_label = ESPUI.addControl(Label, "Programmation", "", ControlColor::Peterriver, Control::noParent);
+  gui_elements.date_label = ESPUI.addControl(Label, gettext("Scheduling"), "", ControlColor::Peterriver, Control::noParent);
   ESPUI.setElementStyle(gui_elements.date_label, label_style);
   gui_elements.schedule_grp = gui_elements.date_label;
   
@@ -214,7 +214,7 @@ void gui_start(void)
     elt = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.schedule_grp, gui_start_time_enable_cb, (void*)i);
     
     // label
-    gui_elements.start_time_str[i] = "Cycle " + String(i + 1);
+    gui_elements.start_time_str[i] = gettext("Cycle ") + String(i + 1);
     elt = ESPUI.addControl(Label, "", gui_elements.start_time_str[i].c_str(), ControlColor::None, gui_elements.schedule_grp);
     ESPUI.setElementStyle(elt, label_style);
     
@@ -227,44 +227,44 @@ void gui_start(void)
   }
 
   // Manual general control
-  elt = ESPUI.addControl(Label, "Contrôle manuel général", "Arrêt forcé", ControlColor::Peterriver, Control::noParent);
+  elt = ESPUI.addControl(Label, gettext("General manual control"), gettext("Force OFF"), ControlColor::Peterriver, Control::noParent);
   ESPUI.setElementStyle(elt, label_style);
   gui_elements.general_manual_grp = elt;
   value = String(settings_get_general_force_off());
   gui_elements.general_force_off_ctrl = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.general_manual_grp, gui_general_force_off_cb);
 
   // General status
-  gui_elements.status_str = "Aucun cycle en cours";
-  gui_elements.status_label = ESPUI.addControl(Label, "Cycle actif", gui_elements.status_str, ControlColor::Alizarin, Control::noParent);
+  gui_elements.status_str = gettext("No active cycle");
+  gui_elements.status_label = ESPUI.addControl(Label, gettext("Active cycle"), gui_elements.status_str, ControlColor::Alizarin, Control::noParent);
   ESPUI.setElementStyle(gui_elements.status_label, label_style);
 
   // Valves settings
   for (int i = 0; i < VALVE_NUMBER; i++) {
-    gui_elements_valve[i].valve_str = "Vanne " + String(i);
+    gui_elements_valve[i].valve_str = gettext("Valve ") + String(i);
     ESPUI.separator(gui_elements_valve[i].valve_str.c_str());
     
     // open duration
-    gui_elements_valve[i].duration_grp = ESPUI.addControl(Label, "Durée d'ouverture", "", ControlColor::Peterriver, Control::noParent);
+    gui_elements_valve[i].duration_grp = ESPUI.addControl(Label, gettext("Opening duration"), "", ControlColor::Peterriver, Control::noParent);
     ESPUI.setElementStyle(gui_elements_valve[i].duration_grp, label_style);
     value = String(settings_get_valve_duration(i));
     gui_elements_valve[i].duration_ctrl = ESPUI.addControl(Number, "", value, ControlColor::None, gui_elements_valve[i].duration_grp, gui_duration_cb, (void*)i);
     ESPUI.addControl(Min, "", "1", None, gui_elements_valve[i].duration_ctrl);
     ESPUI.addControl(Max, "", "60", None, gui_elements_valve[i].duration_ctrl);
-    ESPUI.setElementStyle(ESPUI.addControl(Label, "", "min", ControlColor::Peterriver, gui_elements_valve[i].duration_grp), label_style);
+    ESPUI.setElementStyle(ESPUI.addControl(Label, "", gettext("min"), ControlColor::Peterriver, gui_elements_valve[i].duration_grp), label_style);
     
     // manual control
-    elt = ESPUI.addControl(Label, "Contrôle manuel", "Marche forcée", ControlColor::Peterriver, Control::noParent);
+    elt = ESPUI.addControl(Label, gettext("Manual control"), gettext("Force ON"), ControlColor::Peterriver, Control::noParent);
     ESPUI.setElementStyle(elt, label_style);
     gui_elements_valve[i].manual_grp = elt;
     value = String(settings_get_valve_force_on(i));
     gui_elements_valve[i].force_on_ctrl = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements_valve[i].manual_grp, gui_force_on_cb, (void*)i);
-    elt = ESPUI.addControl(Label, "", "Arrêt forcé", ControlColor::Peterriver, gui_elements_valve[i].manual_grp);
+    elt = ESPUI.addControl(Label, "", gettext("Force OFF"), ControlColor::Peterriver, gui_elements_valve[i].manual_grp);
     ESPUI.setElementStyle(elt, label_style);
     value = String(settings_get_valve_force_off(i));
     gui_elements_valve[i].force_off_ctrl = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements_valve[i].manual_grp, gui_force_off_cb, (void*)i);
 
     // status
-    gui_elements_valve[i].status_label = ESPUI.addControl(Label, "Statut", "OFF", ControlColor::Alizarin, Control::noParent);
+    gui_elements_valve[i].status_label = ESPUI.addControl(Label, gettext("Status"), gettext("OFF"), ControlColor::Alizarin, Control::noParent);
     ESPUI.setElementStyle(gui_elements_valve[i].status_label, label_style);
   }
 
@@ -273,5 +273,5 @@ void gui_start(void)
     gui_general_force_off(true);
   }
   
-  ESPUI.begin("Arrosage automatique");
+  ESPUI.begin(gettext("Automatic watering"));
 }

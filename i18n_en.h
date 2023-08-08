@@ -1,5 +1,5 @@
 /*
-Auto watering settings.
+Auto watering internationalization strings for english.
 Copyright (C) 2023 Mathieu ABATI <mathieu.abati@gmail.com>
 
 This program is free software; you can redistribute it and/or
@@ -17,22 +17,14 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef __CONFIG_H__
-#define __CONFIG_H__
+#include "config.h"
+#ifdef LANG_EN
+#ifndef __I18N_LANG_H__
+#define __I18N_LANG_H__
 
-#define VALVE_NUMBER 5 // 5 valves installed
-#define MAX_START_PER_DAY 2 // maximum possble start time for each day
-#define FORCE_ON_PERSISTENT false // is valves force ON setting persistent accross reboots?
-#define TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3" // Europe/Paris
-int VALVE_GPIO[VALVE_NUMBER] = {
-  12, // valve 0
-  14, // valve 1
-  27, // valve 2
-  26, // valve 3
-  25, // valve 4
-  // 33 // valve 5
-};
+#include "i18n.h"
 
-#define LANG_FR // user language (LANG_FR, LANG_EN)
+i18n_translation_t I18N_TRANSLATIONS[] = {};
 
+#endif
 #endif

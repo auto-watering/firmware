@@ -42,18 +42,6 @@ void settings_store(void);
 bool settings_changed(void);
 
 /**
- * Get general force ON setting.
- * @return true if enabled.
- */
-bool settings_get_general_force_on(void);
-
-/**
- * Set general force ON setting.
- * @param[in] enable / disable.
- */
-void settings_set_general_force_on(bool enable);
-
-/**
  * Get general force OFF setting.
  * @return true if enabled.
  */
@@ -66,18 +54,28 @@ bool settings_get_general_force_off(void);
 void settings_set_general_force_off(bool enable);
 
 /**
- * Get valve start time setting.
- * @param[in] valve index.
- * @return configured start time.
+ * Get start time at given inde.
+ * @param[in] start time index (< MAX_START_PER_DAY), as there can be several start times per day.
+ * @param[out] start time to get at given index.
+ * @return true if a start time is enabled for the given index.
  */
-start_time_t settings_get_valve_start_time(uint16_t id);
+bool settings_get_start_time(int start_time_index, start_time_t *start_time);
 
 /**
- * Set valve start time setting.
- * @param[in] valve index.
- * @param[in] requested start time.
+ * Set start time at given inde.
+ * @param[in] start time index (< MAX_START_PER_DAY), as there can be several start times per day.
+ * @param[out] start time to set at given index.
+ * @return true if start time has been correctly stored at given index.
  */
-void settings_set_valve_start_time(uint16_t id, start_time_t start_time);
+void settings_set_start_time(int start_time_index, start_time_t start_time);
+
+/**
+ * Enable or disable start time at given index.
+ * @param[in] start time index (< MAX_START_PER_DAY), as there can be several start times per day.
+ * @param[out] start time to set at given index.
+ * @return true if start time has been correctly stored at given index.
+ */
+void settings_enable_start_time(int start_time_index, bool enable);
 
 /**
  * Get valve opened duration setting.

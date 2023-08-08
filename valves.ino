@@ -51,10 +51,11 @@ void valves_init(void)
   valves_update();
 }
 
-bool valve_is_scheduled_time_now(int id)
+int get_now_scheduled_valve(void)
 {
+  bool start_time_enabled;
   start_time_t start_time;
-  uint8_t duration;
+  uint8_t duration, duration_sum;
   struct tm now_tm, start_tm, stop_tm;
   time_t now_ts, start_ts, stop_ts;
   
@@ -62,44 +63,54 @@ bool valve_is_scheduled_time_now(int id)
   now_ts = mktime(&now_tm);
   
   start_tm = now_tm;
-  start_time = settings_get_valve_start_time(id);
-  start_tm.tm_hour = start_time.hour;
-  start_tm.tm_min = start_time.minute;
-  start_tm.tm_sec = 0;
-  start_ts = mktime(&start_tm);
-  
-  stop_tm = start_tm;
-  stop_ts = mktime(&stop_tm);
-  duration = settings_get_valve_duration(id);
-  stop_ts += duration * 60;
-  
-  if (start_ts <= now_ts && now_ts < stop_ts) {
-    return true;
+
+  for (int i = 0; i < MAX_START_PER_DAY; i++) {
+    start_time_enabled = settings_get_start_time(i, &start_time);
+    if (!start_time_enabled) {
+      continue;
+    }
+    start_tm.tm_hour = start_time.hour;
+    start_tm.tm_min = start_time.minute;
+    start_tm.tm_sec = 0;
+    start_ts = mktime(&start_tm);
+    duration_sum = 0;
+    for (int j = 0; j < VALVE_NUMBER; j++) {
+      stop_tm = start_tm;
+      stop_ts = mktime(&stop_tm);
+      duration = settings_get_valve_duration(j);
+      duration_sum += duration;
+      stop_ts += duration_sum * 60;
+      if (start_ts <= now_ts && now_ts < stop_ts) {
+        return j;
+      }
+    }
   }
-  return false;
+  return -1;
 }
 
 void valves_update(void)
 {
-  bool general_force_on = settings_get_general_force_on();
   bool general_force_off = settings_get_general_force_off();
   bool opened;
-  
-  if (general_force_on || general_force_off) {
+  int now_scheduled;
+
+  if (general_force_off) {
     for (int i = 0; i < VALVE_NUMBER; i++) {
-      valve_set(i, general_force_on, &opened);
-      if (opened) {
-        return; // open only one valve at a time
-      }
+      valve_set(i, false, &opened);
     }
   } else {
+    now_scheduled = get_now_scheduled_valve();
     for (int i = 0; i < VALVE_NUMBER; i++) {
       bool force_on = settings_get_valve_force_on(i);
       bool force_off = settings_get_valve_force_off(i);
-      if (force_on || force_off) {
-        valve_set(i, force_on, &opened);
+      if (force_on) {
+         valve_set(i, true, &opened);
+      } else if (force_off) {
+         valve_set(i, false, &opened);
+      } else if (i == now_scheduled) {
+         valve_set(i, true, &opened);
       } else {
-        valve_set(i, valve_is_scheduled_time_now(i), &opened);
+         valve_set(i, false, &opened);
       }
       if (opened) {
         return; // open only one valve at a time

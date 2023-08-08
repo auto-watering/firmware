@@ -21,6 +21,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #define __CONFIG_H__
 
 #define VALVE_NUMBER 5 // 5 valves installed
+#define MAX_START_PER_DAY 2 // maximum possble start time for each day
 #define FORCE_ON_PERSISTENT false // is valves force ON setting persistent accross reboots?
 #define TIMEZONE "CET-1CEST,M3.5.0,M10.5.0/3" // Europe/Paris
 int VALVE_GPIO[VALVE_NUMBER] = {

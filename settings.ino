@@ -23,12 +23,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "config.h"
 
 typedef struct settings_s {
-  bool general_force_on, general_force_off;
+  bool general_force_off;
+  start_time_t start_time[MAX_START_PER_DAY];
+  bool start_time_enabled[MAX_START_PER_DAY];
 } settings_t;
 settings_t settings;
 
 typedef struct valve_settings_s {
-  start_time_t start_time;
   uint16_t duration;
   bool force_on, force_off;
 } valve_settings_t;
@@ -69,7 +70,6 @@ void settings_load(void)
     settings_reset();
   }
   if (!FORCE_ON_PERSISTENT) {
-    settings.general_force_on = false;
     for (int i = 0; i < VALVE_NUMBER; i++) {
       valve_settings[i].force_on = false;
     }
@@ -99,14 +99,31 @@ bool settings_changed(void)
   return false;
 }
 
-start_time_t settings_get_valve_start_time(uint16_t id)
+bool settings_get_start_time(int start_time_index, start_time_t *start_time)
 {
-  return valve_settings[id].start_time;
+  if (start_time_index >= MAX_START_PER_DAY) {
+    start_time->hour = 0;
+    start_time->minute = 0;
+    return false;
+  }
+  *start_time = settings.start_time[start_time_index];
+  return settings.start_time_enabled[start_time_index];
 }
 
-void settings_set_valve_start_time(uint16_t id, start_time_t start_time)
+void settings_set_start_time(int start_time_index, start_time_t start_time)
 {
-  valve_settings[id].start_time = start_time;
+  if (start_time_index >= MAX_START_PER_DAY) {
+    return;
+  }
+  settings.start_time[start_time_index] = start_time;
+}
+
+void settings_enable_start_time(int start_time_index, bool enable)
+{
+  if (start_time_index >= MAX_START_PER_DAY) {
+    return;
+  }
+  settings.start_time_enabled[start_time_index] = enable;
 }
 
 uint8_t settings_get_valve_duration(uint16_t id)
@@ -117,16 +134,6 @@ uint8_t settings_get_valve_duration(uint16_t id)
 void settings_set_valve_duration(uint16_t id, uint8_t duration)
 {
   valve_settings[id].duration = duration;
-}
-
-bool settings_get_general_force_on(void)
-{
-  return settings.general_force_on;
-}
-
-void settings_set_general_force_on(bool enable)
-{
-  settings.general_force_on = enable;
 }
 
 bool settings_get_general_force_off(void)

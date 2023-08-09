@@ -25,7 +25,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 typedef struct settings_s {
   bool general_force_off;
   start_time_t start_time[MAX_START_PER_DAY];
-  bool start_time_enabled[MAX_START_PER_DAY];
+  bool cycle_enabled[MAX_START_PER_DAY];
 } settings_t;
 settings_t settings;
 
@@ -34,6 +34,12 @@ typedef struct valve_settings_s {
   bool force_on, force_off;
 } valve_settings_t;
 valve_settings_t valve_settings[VALVE_NUMBER];
+
+typedef struct volatile_settings_s {
+  start_time_t manual_cycle_start_time;
+  bool manual_cycle_enabled;
+} volatile_settings_t;
+volatile_settings_t volatile_settings;
 
 uint32_t settings_crc;
 
@@ -99,31 +105,48 @@ bool settings_changed(void)
   return false;
 }
 
-bool settings_get_start_time(int start_time_index, start_time_t *start_time)
+bool settings_get_cycle_start_time(int cycle_id, start_time_t *start_time)
 {
-  if (start_time_index >= MAX_START_PER_DAY) {
+  if (cycle_id == 0) {
+    *start_time = volatile_settings.manual_cycle_start_time;
+    return volatile_settings.manual_cycle_enabled;
+  } else if (cycle_id <= MAX_START_PER_DAY) {
+    *start_time = settings.start_time[cycle_id - 1];
+    return settings.cycle_enabled[cycle_id - 1];
+  } else {
     start_time->hour = 0;
     start_time->minute = 0;
     return false;
   }
-  *start_time = settings.start_time[start_time_index];
-  return settings.start_time_enabled[start_time_index];
 }
 
-void settings_set_start_time(int start_time_index, start_time_t start_time)
+void settings_set_cycle_start_time(int cycle_id, start_time_t start_time)
 {
-  if (start_time_index >= MAX_START_PER_DAY) {
-    return;
+  if (cycle_id == 0) {
+    volatile_settings.manual_cycle_start_time = start_time;
+  } else if (cycle_id <= MAX_START_PER_DAY) {
+    settings.start_time[cycle_id - 1] = start_time;
   }
-  settings.start_time[start_time_index] = start_time;
 }
 
-void settings_enable_start_time(int start_time_index, bool enable)
+void settings_enable_cycle(int cycle_id, bool enable)
 {
-  if (start_time_index >= MAX_START_PER_DAY) {
-    return;
+  if (cycle_id == 0) {
+    volatile_settings.manual_cycle_enabled = enable;
+  } else if (cycle_id <= MAX_START_PER_DAY) {
+    settings.cycle_enabled[cycle_id - 1] = enable;
   }
-  settings.start_time_enabled[start_time_index] = enable;
+}
+
+bool settings_is_cycle_enabled(int cycle_id)
+{
+  if (cycle_id == 0) {
+    return volatile_settings.manual_cycle_enabled;
+  } else if (cycle_id <= MAX_START_PER_DAY) {
+    return settings.cycle_enabled[cycle_id - 1];
+  } else {
+    return false;
+  }
 }
 
 uint8_t settings_get_valve_duration(uint16_t id)

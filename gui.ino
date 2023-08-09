@@ -32,6 +32,7 @@ gui_elements_valve_t gui_elements_valve[VALVE_NUMBER];
 typedef struct gui_elements_s {
   String start_time_str[MAX_START_PER_DAY];
   uint16_t start_time_ctrl[MAX_START_PER_DAY];
+  uint16_t manuel_cycle_enable_ctrl;
   uint16_t general_force_off_ctrl;
   uint16_t schedule_grp, general_manual_grp;
   uint16_t date_label;
@@ -55,7 +56,11 @@ void gui_status_change(int id, bool status)
   current_cycle = get_current_cycle();
   if (current_cycle != -1) {
     ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Emerald;
-    gui_elements.status_str = gettext("Cycle ") + String(current_cycle + 1) + gettext(" in progress");
+    if (current_cycle == 0) {
+      gui_elements.status_str = gettext("Manual cycle in progress");
+    } else {
+      gui_elements.status_str = gettext("Cycle ") + String(current_cycle) + gettext(" in progress");
+    }
   } else {
     ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Alizarin;
     gui_elements.status_str = gettext("No active cycle");
@@ -73,15 +78,24 @@ void gui_start_time_cb(Control *sender, int type, void* user_data)
   Serial.print(": ");
   Serial.println(sender->value);
   start_time_t start_time = str_to_start_time_t(sender->value);
-  settings_set_start_time(index, start_time);
+  settings_set_cycle_start_time(index, start_time);
 }
 
-void gui_start_time_enable_cb(Control *sender, int type, void* user_data)
+void gui_cycle_enable_cb(Control *sender, int type, void* user_data)
 {
   int index = (int)user_data;
   bool enabled = sender->value.toInt();
-  settings_enable_start_time(index, enabled);
-  ESPUI.setEnabled(gui_elements.start_time_ctrl[index], enabled);
+  settings_enable_cycle(index, enabled);
+  ESPUI.setEnabled(gui_elements.start_time_ctrl[index - 1], enabled);
+}
+
+void gui_manual_cycle_enable_cb(Control *sender, int type)
+{
+  bool enabled = sender->value.toInt();
+  start_time_t start_time;
+  time_get(&(start_time.hour), &(start_time.minute));
+  settings_set_cycle_start_time(0, start_time);
+  settings_enable_cycle(0, enabled);
 }
 
 void gui_duration_cb(Control *sender, int type, void* user_data)
@@ -173,10 +187,14 @@ void gui_refresh(String date, bool valves_state[VALVE_NUMBER])
   // Date
   gui_set_date(date);
 
+  // Status
   for (int i = 0; i < VALVE_NUMBER; i++) {
-    // Status
     gui_status_change(i, valves_state[i]);
   }
+
+  // Manual cycle is disabled automatically when it ends
+  bool enabled = settings_is_cycle_enabled(0);
+  ESPUI.updateControlValue(gui_elements.manuel_cycle_enable_ctrl, String(enabled));
 }
 
 void gui_newline(uint16_t parent)
@@ -203,28 +221,33 @@ void gui_start(void)
   ESPUI.setElementStyle(gui_elements.date_label, label_style);
   gui_elements.schedule_grp = gui_elements.date_label;
   
-  // start time
-  for (int i = 0; i < MAX_START_PER_DAY; i++) {
+  // cycles start time (ignore cycle 0 here, which is manual cycle)
+  for (int i = 1; i <= MAX_START_PER_DAY; i++) {
     start_time_t start_time;
-    bool start_time_enabled = settings_get_start_time(i, &start_time);
+    bool cycle_enabled = settings_get_cycle_start_time(i, &start_time);
     gui_newline(gui_elements.schedule_grp);
     
-    // switcher to enable / disable this time
-    value = String(start_time_enabled);
-    elt = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.schedule_grp, gui_start_time_enable_cb, (void*)i);
+    // switcher to enable / disable this cycle
+    value = String(cycle_enabled);
+    elt = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.schedule_grp, gui_cycle_enable_cb, (void*)i);
     
     // label
-    gui_elements.start_time_str[i] = gettext("Cycle ") + String(i + 1);
-    elt = ESPUI.addControl(Label, "", gui_elements.start_time_str[i].c_str(), ControlColor::None, gui_elements.schedule_grp);
+    gui_elements.start_time_str[i - 1] = gettext("Cycle ") + String(i);
+    elt = ESPUI.addControl(Label, "", gui_elements.start_time_str[i - 1].c_str(), ControlColor::None, gui_elements.schedule_grp);
     ESPUI.setElementStyle(elt, label_style);
     
     // start time input area
     value = start_time_t_to_str(start_time);
-    gui_elements.start_time_ctrl[i] = ESPUI.addControl(Text, "", value, ControlColor::None, gui_elements.schedule_grp, gui_start_time_cb, (void*)i);
-    ESPUI.setElementStyle(gui_elements.start_time_ctrl[i], time_style);
-    ESPUI.setInputType(gui_elements.start_time_ctrl[i], "time");
-    ESPUI.setEnabled(gui_elements.start_time_ctrl[i], start_time_enabled);
+    gui_elements.start_time_ctrl[i - 1] = ESPUI.addControl(Text, "", value, ControlColor::None, gui_elements.schedule_grp, gui_start_time_cb, (void*)i);
+    ESPUI.setElementStyle(gui_elements.start_time_ctrl[i - 1], time_style);
+    ESPUI.setInputType(gui_elements.start_time_ctrl[i - 1], "time");
+    ESPUI.setEnabled(gui_elements.start_time_ctrl[i - 1], cycle_enabled);
   }
+  // manual cycle
+  gui_newline(gui_elements.schedule_grp);
+  gui_elements.manuel_cycle_enable_ctrl = ESPUI.addControl(Switcher, "", "0", ControlColor::None, gui_elements.schedule_grp, gui_manual_cycle_enable_cb);
+  elt = ESPUI.addControl(Label, "", gettext("Manual cycle"), ControlColor::None, gui_elements.schedule_grp);
+  ESPUI.setElementStyle(elt, label_style);
 
   // Manual general control
   elt = ESPUI.addControl(Label, gettext("General manual control"), gettext("Force OFF"), ControlColor::Peterriver, Control::noParent);

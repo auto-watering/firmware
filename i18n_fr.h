@@ -29,6 +29,7 @@ i18n_translation_t I18N_TRANSLATIONS[] = {
   {.msgid = "ON", .translation = "ON"},
   {.msgid = "Cycle ", .translation = "Cycle "},
   {.msgid = " in progress", .translation = " en cours"},
+  {.msgid = "Manual cycle in progress", .translation = "Cycle manuel en cours"},
   {.msgid = "No active cycle", .translation = "Aucun cycle en cours"},
   {.msgid = "Scheduling", .translation = "Programmation"},
   {.msgid = "General manual control", .translation = "Contrôle manuel général"},
@@ -42,6 +43,7 @@ i18n_translation_t I18N_TRANSLATIONS[] = {
   {.msgid = "Force OFF", .translation = "Arrêt forcé"},
   {.msgid = "Status", .translation = "Statut"},
   {.msgid = "Automatic watering", .translation = "Arrosage automatique"},
+  {.msgid = "Manual cycle", .translation = "Cycle manuel"},
 };
 
 #endif

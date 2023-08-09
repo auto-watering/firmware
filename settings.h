@@ -54,28 +54,33 @@ bool settings_get_general_force_off(void);
 void settings_set_general_force_off(bool enable);
 
 /**
- * Get start time at given inde.
- * @param[in] start time index (< MAX_START_PER_DAY), as there can be several start times per day.
- * @param[out] start time to get at given index.
- * @return true if a start time is enabled for the given index.
+ * Get cycle start time.
+ * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+ * @param[out] cycle start time.
+ * @return true if cycle is enabled.
  */
-bool settings_get_start_time(int start_time_index, start_time_t *start_time);
+bool settings_get_cycle_start_time(int cycle_id, start_time_t *start_time);
 
 /**
- * Set start time at given inde.
- * @param[in] start time index (< MAX_START_PER_DAY), as there can be several start times per day.
- * @param[out] start time to set at given index.
- * @return true if start time has been correctly stored at given index.
+ * Set cycle start time.
+ * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+ * @param[out] cycle start time.
  */
-void settings_set_start_time(int start_time_index, start_time_t start_time);
+void settings_set_cycle_start_time(int cycle_id, start_time_t start_time);
 
 /**
- * Enable or disable start time at given index.
- * @param[in] start time index (< MAX_START_PER_DAY), as there can be several start times per day.
- * @param[out] start time to set at given index.
- * @return true if start time has been correctly stored at given index.
+ * Enable or disable cycle.
+ * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+ * @param[in] true to enable cycle
  */
-void settings_enable_start_time(int start_time_index, bool enable);
+void settings_enable_cycle(int cycle_id, bool enable);
+
+/**
+ * Check if a cycle is enabled.
+  * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+ * @return true if cycle is enabled.
+ */
+bool settings_is_cycle_enabled(int cycle_id);
 
 /**
  * Get valve opened duration setting.

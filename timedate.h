@@ -36,6 +36,6 @@ String time_get_formatted(void);
  * @param[out] minute.
  * @return true on success.
  */
-bool time_get(int *hour, int *minute);
+bool time_get(uint8_t *hour, uint8_t *minute);
 
 #endif

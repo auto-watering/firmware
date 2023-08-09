@@ -61,7 +61,7 @@ String time_get_formatted(void)
   return String(buffer);
 }
 
-bool time_get(int *hour, int *minute)
+bool time_get(uint8_t *hour, uint8_t *minute)
 {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)){

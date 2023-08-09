@@ -53,7 +53,7 @@ void valves_init(void)
 
 int get_now_scheduled_valve(void)
 {
-  bool start_time_enabled;
+  bool cycle_enabled;
   start_time_t start_time;
   uint8_t duration, duration_sum;
   struct tm now_tm, start_tm, stop_tm;
@@ -64,9 +64,9 @@ int get_now_scheduled_valve(void)
   
   start_tm = now_tm;
 
-  for (int i = 0; i < MAX_START_PER_DAY; i++) {
-    start_time_enabled = settings_get_start_time(i, &start_time);
-    if (!start_time_enabled) {
+  for (int i = 0; i <= MAX_START_PER_DAY; i++) {
+    cycle_enabled = settings_get_cycle_start_time(i, &start_time);
+    if (!cycle_enabled) {
       continue;
     }
     start_tm.tm_hour = start_time.hour;
@@ -86,6 +86,7 @@ int get_now_scheduled_valve(void)
       }
     }
   }
+  settings_enable_cycle(0, false); // disable manual cycle
   current_cycle = -1;
   return -1;
 }

@@ -1,3 +1,7 @@
+1.1.1 - 08/09/2023
+- Add manual cycle option
+- Renamed start_time_t to timeinfo_t, and moved its declaration to timedate.h
+
 1.1.0 - 08/08/2023
 - Now using global start times, defining cycles start, to be able to have several cycles per day
 - Add current cycle information in GUI

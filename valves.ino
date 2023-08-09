@@ -19,6 +19,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "valves.h"
 #include "settings.h"
+#include "timedate.h"
 
 bool valves_state[VALVE_NUMBER];
 int current_cycle = -1;
@@ -54,7 +55,7 @@ void valves_init(void)
 int get_now_scheduled_valve(void)
 {
   bool cycle_enabled;
-  start_time_t start_time;
+  timeinfo_t start_time;
   uint8_t duration, duration_sum;
   struct tm now_tm, start_tm, stop_tm;
   time_t now_ts, start_ts, stop_ts;

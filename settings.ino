@@ -24,7 +24,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 typedef struct settings_s {
   bool general_force_off;
-  start_time_t start_time[MAX_START_PER_DAY];
+  timeinfo_t start_time[MAX_START_PER_DAY];
   bool cycle_enabled[MAX_START_PER_DAY];
 } settings_t;
 settings_t settings;
@@ -36,7 +36,7 @@ typedef struct valve_settings_s {
 valve_settings_t valve_settings[VALVE_NUMBER];
 
 typedef struct volatile_settings_s {
-  start_time_t manual_cycle_start_time;
+  timeinfo_t manual_cycle_start_time;
   bool manual_cycle_enabled;
 } volatile_settings_t;
 volatile_settings_t volatile_settings;
@@ -105,7 +105,7 @@ bool settings_changed(void)
   return false;
 }
 
-bool settings_get_cycle_start_time(int cycle_id, start_time_t *start_time)
+bool settings_get_cycle_start_time(int cycle_id, timeinfo_t *start_time)
 {
   if (cycle_id == 0) {
     *start_time = volatile_settings.manual_cycle_start_time;
@@ -120,7 +120,7 @@ bool settings_get_cycle_start_time(int cycle_id, start_time_t *start_time)
   }
 }
 
-void settings_set_cycle_start_time(int cycle_id, start_time_t start_time)
+void settings_set_cycle_start_time(int cycle_id, timeinfo_t start_time)
 {
   if (cycle_id == 0) {
     volatile_settings.manual_cycle_start_time = start_time;
@@ -189,9 +189,9 @@ void settings_set_valve_force_off(uint16_t id, bool enable)
   valve_settings[id].force_off = enable;
 }
 
-start_time_t str_to_start_time_t(String time_str)
+timeinfo_t str_to_timeinfo_t(String time_str)
 {
-  start_time_t start_time;
+  timeinfo_t start_time;
 
   start_time.hour = 0;
   start_time.minute = 0;
@@ -204,7 +204,7 @@ start_time_t str_to_start_time_t(String time_str)
   return start_time;
 }
 
-String start_time_t_to_str(start_time_t start_time)
+String timeinfo_t_to_str(timeinfo_t start_time)
 {
   String time_str;
   if (start_time.hour < 10) {

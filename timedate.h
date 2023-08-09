@@ -20,6 +20,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __TIMEDATE_H__
 #define __TIMEDATE_H__
 
+typedef struct start_time_s {
+  uint8_t hour;
+  uint8_t minute;
+} timeinfo_t;
+
 /**
  * Initialize time according to time zone configured in config.h.
  */
@@ -32,10 +37,9 @@ String time_get_formatted(void);
 
 /**
  * Get current time.
- * @param[out] hour.
- * @param[out] minute.
+ * @param[out] current time.
  * @return true on success.
  */
-bool time_get(uint8_t *hour, uint8_t *minute);
+bool time_get(timeinfo_t *current_time);
 
 #endif

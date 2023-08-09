@@ -77,7 +77,7 @@ void gui_start_time_cb(Control *sender, int type, void* user_data)
   Serial.print(" changed");
   Serial.print(": ");
   Serial.println(sender->value);
-  start_time_t start_time = str_to_start_time_t(sender->value);
+  timeinfo_t start_time = str_to_timeinfo_t(sender->value);
   settings_set_cycle_start_time(index, start_time);
 }
 
@@ -92,8 +92,8 @@ void gui_cycle_enable_cb(Control *sender, int type, void* user_data)
 void gui_manual_cycle_enable_cb(Control *sender, int type)
 {
   bool enabled = sender->value.toInt();
-  start_time_t start_time;
-  time_get(&(start_time.hour), &(start_time.minute));
+  timeinfo_t start_time;
+  time_get(&start_time);
   settings_set_cycle_start_time(0, start_time);
   settings_enable_cycle(0, enabled);
 }
@@ -223,7 +223,7 @@ void gui_start(void)
   
   // cycles start time (ignore cycle 0 here, which is manual cycle)
   for (int i = 1; i <= MAX_START_PER_DAY; i++) {
-    start_time_t start_time;
+    timeinfo_t start_time;
     bool cycle_enabled = settings_get_cycle_start_time(i, &start_time);
     gui_newline(gui_elements.schedule_grp);
     
@@ -237,7 +237,7 @@ void gui_start(void)
     ESPUI.setElementStyle(elt, label_style);
     
     // start time input area
-    value = start_time_t_to_str(start_time);
+    value = timeinfo_t_to_str(start_time);
     gui_elements.start_time_ctrl[i - 1] = ESPUI.addControl(Text, "", value, ControlColor::None, gui_elements.schedule_grp, gui_start_time_cb, (void*)i);
     ESPUI.setElementStyle(gui_elements.start_time_ctrl[i - 1], time_style);
     ESPUI.setInputType(gui_elements.start_time_ctrl[i - 1], "time");

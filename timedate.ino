@@ -61,14 +61,14 @@ String time_get_formatted(void)
   return String(buffer);
 }
 
-bool time_get(uint8_t *hour, uint8_t *minute)
+bool time_get(timeinfo_t *current_time)
 {
   struct tm timeinfo;
   if (!getLocalTime(&timeinfo)){
     Serial.println("Failed to get time !");
     return false;
   }
-  *hour = timeinfo.tm_hour;
-  *minute = timeinfo.tm_min;
+  current_time->hour = timeinfo.tm_hour;
+  current_time->minute = timeinfo.tm_min;
   return true;
 }

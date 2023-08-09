@@ -20,10 +20,7 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #ifndef __SETTINGS_H__
 #define __SETTINGS_H__
 
-typedef struct start_time_s {
-  uint8_t hour;
-  uint8_t minute;
-} start_time_t;
+#include "timedate.h"
 
 /**
  * Load settings from persistent memory.
@@ -59,14 +56,14 @@ void settings_set_general_force_off(bool enable);
  * @param[out] cycle start time.
  * @return true if cycle is enabled.
  */
-bool settings_get_cycle_start_time(int cycle_id, start_time_t *start_time);
+bool settings_get_cycle_start_time(int cycle_id, timeinfo_t *start_time);
 
 /**
  * Set cycle start time.
  * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
  * @param[out] cycle start time.
  */
-void settings_set_cycle_start_time(int cycle_id, start_time_t start_time);
+void settings_set_cycle_start_time(int cycle_id, timeinfo_t start_time);
 
 /**
  * Enable or disable cycle.
@@ -125,17 +122,17 @@ bool settings_get_valve_force_off(uint16_t id);
 void settings_set_valve_force_off(uint16_t id, bool enable);
 
 /**
- * Convert time string to start_time_t.
+ * Convert time string to timeinfo_t.
  * @param[in] time string, format "HH:MM".
- * @return start_time_t time format.
+ * @return timeinfo_t time format.
  */
-start_time_t str_to_start_time_t(String time_str);
+timeinfo_t str_to_timeinfo_t(String time_str);
 
 /**
- * Convert start_time_t to time string.
- * @param[in] start_time_t time format.
+ * Convert timeinfo_t to time string.
+ * @param[in] timeinfo_t time format.
  * @return time string, format "HH:MM".
  */
-String start_time_t_to_str(start_time_t start_time);
+String timeinfo_t_to_str(timeinfo_t start_time);
 
 #endif

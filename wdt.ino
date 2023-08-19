@@ -1,5 +1,5 @@
 /*
-Auto watering entry point.
+Watch dog timer implementation.
 Copyright (C) 2023 Mathieu ABATI <mathieu.abati@gmail.com>
 
 This program is free software; you can redistribute it and/or
@@ -17,32 +17,17 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <ESPUI.h>
+#include <esp_task_wdt.h>
 
-#include "net.h"
-#include "timedate.h"
-#include "settings.h"
-#include "gui.h"
-#include "valves.h"
+#define WDT_TIMEOUT 5
 
-void setup() {
-  Serial.begin(115200);
-  while (!Serial);
-  valves_init();
-  settings_load();
-  net_start();
-  time_init();
-  gui_start();
-  wdt_init();
+void wdt_init(void)
+{
+  esp_task_wdt_init(WDT_TIMEOUT, true);
+  esp_task_wdt_add(NULL);
 }
 
-void loop() {
-  net_keep_alive();
-  valves_update();
-  gui_refresh(time_get_formatted(), get_valves_state());
-  if (settings_changed()) {
-    settings_store();
-  }
-  wdt_notify();
-  delay(1000);
+void wdt_notify(void)
+{
+  esp_task_wdt_reset();
 }

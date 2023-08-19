@@ -36,6 +36,7 @@ void setup() {
 }
 
 void loop() {
+  net_keep_alive();
   valves_update();
   gui_refresh(time_get_formatted(), get_valves_state());
   if (settings_changed()) {

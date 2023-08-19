@@ -25,4 +25,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
 void net_start(void);
 
+/**
+ * Ensure WiFi connection is kept alive, and reconnect if necessary.
+ */
+void net_keep_alive(void);
+
 #endif

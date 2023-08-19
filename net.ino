@@ -20,6 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <WiFi.h>
 #include "config_wifi.h"
 
+#define RECONNECT_INTERVAL 30000
+unsigned long previous_reconnect_date;
+
 void net_start(void)
 {
   Serial.print("Connecting");  
@@ -32,4 +35,16 @@ void net_start(void)
   Serial.println();
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
+  previous_reconnect_date = millis();
+}
+
+void net_keep_alive(void)
+{
+  unsigned long current_date = millis();
+  if ((WiFi.status() != WL_CONNECTED) && (current_date - previous_reconnect_date >= RECONNECT_INTERVAL)) {
+    Serial.println("Connection lost, reconnecting");
+    WiFi.disconnect();
+    WiFi.reconnect();
+    previous_reconnect_date = current_date;
+  }
 }

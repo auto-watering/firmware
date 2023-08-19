@@ -1,3 +1,7 @@
+1.1.2 - 08/19/2023
+- Reconnect WiFi in case of connection lost
+- Use hardware watch dog timer to recover in case of crash
+
 1.1.1 - 08/09/2023
 - Add manual cycle option
 - Renamed start_time_t to timeinfo_t, and moved its declaration to timedate.h

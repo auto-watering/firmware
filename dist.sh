@@ -10,9 +10,9 @@ cp *.h dist
 cp *.ino dist
 cp ChangeLog dist
 cp AUTHOR LICENSE dist
+cp config.h.example dist
 
-sed -i 's/#define WIFI_ESSID.*/#define WIFI_ESSID/g' dist/config_wifi.h
-sed -i 's/#define WIFI_PASSWORD.*/#define WIFI_PASSWORD/g' dist/config_wifi.h
+rm dist/config.h
 
 TAG=$(git describe --tags)
 CWD=$(pwd)

@@ -311,7 +311,7 @@ void gui_start(void)
 
   // Valves settings
   for (int i = 0; i < VALVE_NUMBER; i++) {
-    gui_elements_valve[i].valve_str = gettext("Valve ") + String(i);
+    gui_elements_valve[i].valve_str = gettext("Valve ") + String(i + 1);
     ESPUI.separator(gui_elements_valve[i].valve_str.c_str());
     
     // open duration

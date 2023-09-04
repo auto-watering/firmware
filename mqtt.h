@@ -1,5 +1,5 @@
 /*
-Auto watering entry point.
+Auto watering MQTT client API.
 Copyright (C) 2023 Mathieu ABATI <mathieu.abati@gmail.com>
 
 This program is free software; you can redistribute it and/or
@@ -17,39 +17,18 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <ESPUI.h>
+#ifndef __MQTT_H__
+#define __MQTT_H__
 
-#include "config.h"
-#include "net.h"
-#include "timedate.h"
-#include "settings.h"
-#include "gui.h"
-#include "valves.h"
+/**
+ * Start MQTT client.
+ * Network has to be initialized before with net_start() from net.h.
+ */
+void mqtt_start(void);
 
-void setup() {
-  Serial.begin(115200);
-  while (!Serial);
-  valves_init();
-  settings_load();
-  net_start();
-  time_init();
-  gui_start();
-#ifdef USE_MQTT
-  mqtt_start();
+/**
+ * MQTT client loop.
+ */
+void mqtt_refresh(void);
+
 #endif
-  wdt_init();
-}
-
-void loop() {
-  net_keep_alive();
-  valves_update();
-  gui_refresh(time_get_formatted(), get_valves_state());
-#ifdef USE_MQTT
-  mqtt_refresh();
-#endif
-  if (settings_changed()) {
-    settings_store();
-  }
-  wdt_notify();
-  delay(10);
-}

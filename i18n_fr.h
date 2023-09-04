@@ -37,7 +37,7 @@ i18n_translation_t I18N_TRANSLATIONS[] = {
   {.msgid = "Active cycle", .translation = "Cycle actif"},
   {.msgid = "Valve ", .translation = "Vanne "},
   {.msgid = "Opening duration", .translation = "Durée d'ouverture"},
-  {.msgid = "min", .translation = "min"},
+  {.msgid = "minutes", .translation = "minutes"},
   {.msgid = "Manual control", .translation = "Contrôle manuel"},
   {.msgid = "Force ON", .translation = "Marche forcée"},
   {.msgid = "Force OFF", .translation = "Arrêt forcé"},

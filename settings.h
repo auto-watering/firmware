@@ -33,10 +33,23 @@ void settings_load(void);
 void settings_store(void);
 
 /**
- * Check if settings have changed.
+ * Check if settings have changed since last call to settings_store().
  * @return false if settings are unchanged.
  */
 bool settings_changed(void);
+
+/**
+ * Check if settings have changed according to given CRC.
+ * @param[in/out] CRC, which is updated on return with the current one.
+ * @return false if settings are unchanged.
+ */
+bool settings_changed(uint32_t *crc);
+
+/**
+ * Get current settings CRC.
+ * @return Settings CRC.
+ */
+uint32_t settings_get_crc(void);
 
 /**
  * Get general force OFF setting.

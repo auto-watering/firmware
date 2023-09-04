@@ -67,4 +67,30 @@ int VALVE_GPIO[VALVE_NUMBER] = {
 // User language (LANG_FR, LANG_EN)
 #define LANG_FR // french
 
+/*
+ * MQTT settings
+ */
+
+// Enable MQTT client
+//#define USE_MQTT
+
+// Device name
+#define MQTT_DEVICE_NAME "auto_watering"
+
+// Broker server address
+#define MQTT_SERVER ""
+
+// Broker server port
+#define MQTT_PORT 1883
+
+// Broker server user
+#define MQTT_USER ""
+
+// Broker server password
+#define MQTT_PASSWORD ""
+
+// Discovery topic prefix (optional, but recommended)
+// For HomeAssistant, it is "homeassistant" by default
+//#define MQTT_DISCOVERY_TOPIC_PREFIX
+
 #endif

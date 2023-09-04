@@ -32,6 +32,7 @@ gui_elements_valve_t gui_elements_valve[VALVE_NUMBER];
 typedef struct gui_elements_s {
   String start_time_str[MAX_START_PER_DAY];
   uint16_t start_time_ctrl[MAX_START_PER_DAY];
+  uint16_t cycle_enable_ctrl[MAX_START_PER_DAY];
   uint16_t manuel_cycle_enable_ctrl;
   uint16_t general_force_off_ctrl;
   uint16_t schedule_grp, general_manual_grp;
@@ -40,6 +41,8 @@ typedef struct gui_elements_s {
   String status_str;
 } gui_elements_t;
 gui_elements_t gui_elements;
+
+uint32_t gui_settings_crc;
 
 void gui_status_change(int id, bool status)
 {
@@ -182,10 +185,55 @@ void gui_set_date(String date)
   ESPUI.updateLabel(gui_elements.date_label, date);
 }
 
+void gui_reload_settings(void)
+{
+  String value;
+  bool enabled;
+
+  // Schedule
+  // cycles start time (ignore cycle 0 here, which is manual cycle)
+  for (int i = 1; i <= MAX_START_PER_DAY; i++) {
+    timeinfo_t start_time;
+    bool cycle_enabled = settings_get_cycle_start_time(i, &start_time);
+    
+    // switcher to enable / disable this cycle
+    ESPUI.updateControlValue(gui_elements.cycle_enable_ctrl[i - 1], String(cycle_enabled));
+    
+    // start time input area
+    value = timeinfo_t_to_str(start_time);
+    ESPUI.updateControlValue(gui_elements.start_time_ctrl[i - 1], value);
+    ESPUI.setEnabled(gui_elements.start_time_ctrl[i - 1], cycle_enabled);
+  }
+
+  // Manual general control
+  value = String(settings_get_general_force_off());
+  ESPUI.updateControlValue(gui_elements.general_force_off_ctrl, value);
+  if (settings_get_general_force_off()) {
+    gui_general_force_off(true);
+  }
+
+  // Valves settings
+  for (int i = 0; i < VALVE_NUMBER; i++) {
+    // open duration
+    ESPUI.updateSlider(gui_elements_valve[i].duration_ctrl, settings_get_valve_duration(i));
+    
+    // manual control
+    value = String(settings_get_valve_force_on(i));
+    ESPUI.updateControlValue(gui_elements_valve[i].force_on_ctrl, value);
+    value = String(settings_get_valve_force_off(i));
+    ESPUI.updateControlValue(gui_elements_valve[i].force_off_ctrl, value);
+  }
+}
+
 void gui_refresh(String date, bool valves_state[VALVE_NUMBER])
 { 
   // Date
   gui_set_date(date);
+
+  // Settings
+  if (settings_changed(&gui_settings_crc)) {
+    gui_reload_settings();
+  }
 
   // Status
   for (int i = 0; i < VALVE_NUMBER; i++) {
@@ -229,7 +277,7 @@ void gui_start(void)
     
     // switcher to enable / disable this cycle
     value = String(cycle_enabled);
-    elt = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.schedule_grp, gui_cycle_enable_cb, (void*)i);
+    gui_elements.cycle_enable_ctrl[i - 1] = ESPUI.addControl(Switcher, "", value, ControlColor::None, gui_elements.schedule_grp, gui_cycle_enable_cb, (void*)i);
     
     // label
     gui_elements.start_time_str[i - 1] = gettext("Cycle ") + String(i);
@@ -269,11 +317,11 @@ void gui_start(void)
     // open duration
     gui_elements_valve[i].duration_grp = ESPUI.addControl(Label, gettext("Opening duration"), "", ControlColor::Peterriver, Control::noParent);
     ESPUI.setElementStyle(gui_elements_valve[i].duration_grp, label_style);
+    ESPUI.setElementStyle(ESPUI.addControl(Label, "", gettext("minutes"), ControlColor::Peterriver, gui_elements_valve[i].duration_grp), label_style);
     value = String(settings_get_valve_duration(i));
-    gui_elements_valve[i].duration_ctrl = ESPUI.addControl(Number, "", value, ControlColor::None, gui_elements_valve[i].duration_grp, gui_duration_cb, (void*)i);
+    gui_elements_valve[i].duration_ctrl = ESPUI.addControl(Slider, "", value, ControlColor::None, gui_elements_valve[i].duration_grp, gui_duration_cb, (void*)i);
     ESPUI.addControl(Min, "", "1", None, gui_elements_valve[i].duration_ctrl);
     ESPUI.addControl(Max, "", "60", None, gui_elements_valve[i].duration_ctrl);
-    ESPUI.setElementStyle(ESPUI.addControl(Label, "", gettext("min"), ControlColor::Peterriver, gui_elements_valve[i].duration_grp), label_style);
     
     // manual control
     elt = ESPUI.addControl(Label, gettext("Manual control"), gettext("Force ON"), ControlColor::Peterriver, Control::noParent);
@@ -297,4 +345,6 @@ void gui_start(void)
   }
   
   ESPUI.begin(gettext("Automatic watering"));
+
+  gui_settings_crc = settings_get_crc();
 }

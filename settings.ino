@@ -43,12 +43,12 @@ volatile_settings_t volatile_settings;
 
 uint32_t settings_crc;
 
-void settings_compute_crc(void)
+uint32_t settings_compute_crc(void)
 {
   CRC32 crc;
   crc.update(reinterpret_cast<const uint8_t*>(&settings), sizeof(settings));
   crc.update(reinterpret_cast<const uint8_t*>(&valve_settings), sizeof(valve_settings));
-  settings_crc = crc.finalize();
+  return crc.finalize();
 }
 
 void settings_reset(void)
@@ -66,7 +66,7 @@ void settings_load(void)
   uint32_t stored_crc;
   EEPROM.get(sizeof(settings) + sizeof(valve_settings), stored_crc);
   Serial.println("Settings loaded");
-  settings_compute_crc();
+  settings_crc = settings_compute_crc();
   if (stored_crc != settings_crc) {
     Serial.print("Stored CRC (");
     Serial.print(stored_crc);
@@ -87,7 +87,7 @@ void settings_store(void)
   EEPROM.begin(512);
   EEPROM.put(0, settings);
   EEPROM.put(sizeof(settings), valve_settings);
-  settings_compute_crc();
+  settings_crc = settings_compute_crc();
   EEPROM.put(sizeof(settings) + sizeof(valve_settings), settings_crc);
   Serial.print("Writing EEPROM, CRC is ");
   Serial.println(settings_crc);
@@ -97,12 +97,28 @@ void settings_store(void)
 
 bool settings_changed(void)
 {
-  uint32_t last_crc = settings_crc;
-  settings_compute_crc();
-  if (last_crc != settings_crc) {
+  uint32_t current_crc = settings_compute_crc();
+  if (current_crc != settings_crc) {
     return true;
   }
   return false;
+}
+
+bool settings_changed(uint32_t *crc)
+{
+  bool ret = false;
+  uint32_t current_crc = settings_compute_crc();
+  if (*crc != current_crc) {
+    ret = true;
+  }
+  *crc = current_crc;
+  return ret;
+}
+
+uint32_t settings_get_crc(void)
+{
+  settings_compute_crc();
+  return settings_crc;
 }
 
 bool settings_get_cycle_start_time(int cycle_id, timeinfo_t *start_time)

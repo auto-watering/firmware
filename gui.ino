@@ -168,7 +168,6 @@ void gui_general_force_off(bool enable)
   }
   settings_set_general_force_off(enable);
   for (int i = 0; i < VALVE_NUMBER; i++) {
-    gui_force_off(i, enable);
     ESPUI.setEnabled(gui_elements_valve[i].force_on_ctrl, !enable);
     ESPUI.setEnabled(gui_elements_valve[i].force_off_ctrl, !enable);
   }

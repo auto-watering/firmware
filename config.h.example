@@ -52,7 +52,7 @@ int VALVE_GPIO[VALVE_NUMBER] = {
  */
 
 // Maximum number of cycles per day
-#define MAX_START_PER_DAY 2
+#define CYCLES_NUMBER 2
 
 // Is valves force ON setting persistent accross reboots?
 #define FORCE_ON_PERSISTENT false

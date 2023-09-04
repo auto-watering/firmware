@@ -31,8 +31,8 @@ uint32_t mqtt_settings_crc;
 
 typedef struct mqtt_published_data_s {
   bool general_force_off;
-  timeinfo_t cycle_start_time[MAX_START_PER_DAY + 1];
-  bool cycle_enabled[MAX_START_PER_DAY + 1];
+  timeinfo_t cycle_start_time[CYCLES_NUMBER + 1];
+  bool cycle_enabled[CYCLES_NUMBER + 1];
   uint16_t valve_duration[VALVE_NUMBER];
   bool valve_force_on[VALVE_NUMBER];
   bool valve_force_off[VALVE_NUMBER];
@@ -98,7 +98,6 @@ void mqtt_publish_discovery_number(const char *topic, const char *name, int min 
     "max": ")" + String(max) + R"(",
     "step": "1"
   })";
-  Serial.println(discovery_message);
   mqtt_client.publish(discovery_topic.c_str(), discovery_message.c_str(), true);
 #endif
 }
@@ -157,7 +156,7 @@ void mqtt_publish(bool force = false)
 
   // Load new data
   new_published_data.general_force_off = settings_get_general_force_off();
-  for (int i = 0; i <= MAX_START_PER_DAY; i++) {
+  for (int i = 0; i <= CYCLES_NUMBER; i++) {
     new_published_data.cycle_enabled[i] = settings_get_cycle_start_time(i, &(new_published_data.cycle_start_time[i]));
   }
   for (int i = 0; i < VALVE_NUMBER; i++) {
@@ -173,7 +172,7 @@ void mqtt_publish(bool force = false)
     mqtt_publish_data(topic, payload);
   }
   // Cycles info
-  for (int i = 0; i <= MAX_START_PER_DAY; i++) {
+  for (int i = 0; i <= CYCLES_NUMBER; i++) {
     // enabled
     if (force || mqtt_published_data.cycle_enabled[i] != new_published_data.cycle_enabled[i]) {
       topic = String(MQTT_TOPIC_CYCLE_ENABLED) + String(i);
@@ -225,7 +224,7 @@ bool mqtt_connect(void)
     mqtt_client.subscribe(MQTT_TOPIC_FORCE_OFF MQTT_TOPIC_SET_SUFFIX);
     mqtt_publish_discovery_switch(MQTT_TOPIC_FORCE_OFF, MQTT_TOPIC_NAME_FORCE_OFF);
     // Cycles info
-    for (int i = 0; i <= MAX_START_PER_DAY; i++) {
+    for (int i = 0; i <= CYCLES_NUMBER; i++) {
       String topic, name;
       // enabled
       topic = String(MQTT_TOPIC_CYCLE_ENABLED) + String(i);

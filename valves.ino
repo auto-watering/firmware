@@ -65,7 +65,7 @@ int get_now_scheduled_valve(void)
   
   start_tm = now_tm;
 
-  for (int i = 0; i <= MAX_START_PER_DAY; i++) {
+  for (int i = 0; i <= CYCLES_NUMBER; i++) {
     cycle_enabled = settings_get_cycle_start_time(i, &start_time);
     if (!cycle_enabled) {
       continue;

@@ -24,8 +24,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 typedef struct settings_s {
   bool general_force_off;
-  timeinfo_t start_time[MAX_START_PER_DAY];
-  bool cycle_enabled[MAX_START_PER_DAY];
+  timeinfo_t start_time[CYCLES_NUMBER];
+  bool cycle_enabled[CYCLES_NUMBER];
 } settings_t;
 settings_t settings;
 
@@ -126,7 +126,7 @@ bool settings_get_cycle_start_time(int cycle_id, timeinfo_t *start_time)
   if (cycle_id == 0) {
     *start_time = volatile_settings.manual_cycle_start_time;
     return volatile_settings.manual_cycle_enabled;
-  } else if (cycle_id <= MAX_START_PER_DAY) {
+  } else if (cycle_id <= CYCLES_NUMBER) {
     *start_time = settings.start_time[cycle_id - 1];
     return settings.cycle_enabled[cycle_id - 1];
   } else {
@@ -140,7 +140,7 @@ void settings_set_cycle_start_time(int cycle_id, timeinfo_t start_time)
 {
   if (cycle_id == 0) {
     volatile_settings.manual_cycle_start_time = start_time;
-  } else if (cycle_id <= MAX_START_PER_DAY) {
+  } else if (cycle_id <= CYCLES_NUMBER) {
     settings.start_time[cycle_id - 1] = start_time;
   }
 }
@@ -149,7 +149,7 @@ void settings_enable_cycle(int cycle_id, bool enable)
 {
   if (cycle_id == 0) {
     volatile_settings.manual_cycle_enabled = enable;
-  } else if (cycle_id <= MAX_START_PER_DAY) {
+  } else if (cycle_id <= CYCLES_NUMBER) {
     settings.cycle_enabled[cycle_id - 1] = enable;
   }
 }
@@ -158,7 +158,7 @@ bool settings_is_cycle_enabled(int cycle_id)
 {
   if (cycle_id == 0) {
     return volatile_settings.manual_cycle_enabled;
-  } else if (cycle_id <= MAX_START_PER_DAY) {
+  } else if (cycle_id <= CYCLES_NUMBER) {
     return settings.cycle_enabled[cycle_id - 1];
   } else {
     return false;

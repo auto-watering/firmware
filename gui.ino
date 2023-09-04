@@ -30,9 +30,9 @@ typedef struct gui_elements_valve_s {
 gui_elements_valve_t gui_elements_valve[VALVE_NUMBER];
 
 typedef struct gui_elements_s {
-  String start_time_str[MAX_START_PER_DAY];
-  uint16_t start_time_ctrl[MAX_START_PER_DAY];
-  uint16_t cycle_enable_ctrl[MAX_START_PER_DAY];
+  String start_time_str[CYCLES_NUMBER];
+  uint16_t start_time_ctrl[CYCLES_NUMBER];
+  uint16_t cycle_enable_ctrl[CYCLES_NUMBER];
   uint16_t manuel_cycle_enable_ctrl;
   uint16_t general_force_off_ctrl;
   uint16_t schedule_grp, general_manual_grp;
@@ -191,7 +191,7 @@ void gui_reload_settings(void)
 
   // Schedule
   // cycles start time (ignore cycle 0 here, which is manual cycle)
-  for (int i = 1; i <= MAX_START_PER_DAY; i++) {
+  for (int i = 1; i <= CYCLES_NUMBER; i++) {
     timeinfo_t start_time;
     bool cycle_enabled = settings_get_cycle_start_time(i, &start_time);
     
@@ -269,7 +269,7 @@ void gui_start(void)
   gui_elements.schedule_grp = gui_elements.date_label;
   
   // cycles start time (ignore cycle 0 here, which is manual cycle)
-  for (int i = 1; i <= MAX_START_PER_DAY; i++) {
+  for (int i = 1; i <= CYCLES_NUMBER; i++) {
     timeinfo_t start_time;
     bool cycle_enabled = settings_get_cycle_start_time(i, &start_time);
     gui_newline(gui_elements.schedule_grp);

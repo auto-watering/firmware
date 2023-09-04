@@ -65,7 +65,7 @@ void settings_set_general_force_off(bool enable);
 
 /**
  * Get cycle start time.
- * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+ * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on CYCLES_NUMBER.
  * @param[out] cycle start time.
  * @return true if cycle is enabled.
  */
@@ -73,21 +73,21 @@ bool settings_get_cycle_start_time(int cycle_id, timeinfo_t *start_time);
 
 /**
  * Set cycle start time.
- * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+ * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on CYCLES_NUMBER.
  * @param[out] cycle start time.
  */
 void settings_set_cycle_start_time(int cycle_id, timeinfo_t start_time);
 
 /**
  * Enable or disable cycle.
- * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+ * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on CYCLES_NUMBER.
  * @param[in] true to enable cycle
  */
 void settings_enable_cycle(int cycle_id, bool enable);
 
 /**
  * Check if a cycle is enabled.
-  * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on MAX_START_PER_DAY.
+  * @param[in] cycle index, 0 is for manual cycle, and other valid indexes depends on CYCLES_NUMBER.
  * @return true if cycle is enabled.
  */
 bool settings_is_cycle_enabled(int cycle_id);

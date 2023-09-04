@@ -134,18 +134,4 @@ bool settings_get_valve_force_off(uint16_t id);
  */
 void settings_set_valve_force_off(uint16_t id, bool enable);
 
-/**
- * Convert time string to timeinfo_t.
- * @param[in] time string, format "HH:MM".
- * @return timeinfo_t time format.
- */
-timeinfo_t str_to_timeinfo_t(String time_str);
-
-/**
- * Convert timeinfo_t to time string.
- * @param[in] timeinfo_t time format.
- * @return time string, format "HH:MM".
- */
-String timeinfo_t_to_str(timeinfo_t start_time);
-
 #endif

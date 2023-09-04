@@ -204,35 +204,3 @@ void settings_set_valve_force_off(uint16_t id, bool enable)
 {
   valve_settings[id].force_off = enable;
 }
-
-timeinfo_t str_to_timeinfo_t(String time_str)
-{
-  timeinfo_t start_time;
-
-  start_time.hour = 0;
-  start_time.minute = 0;
-  int colidx = time_str.indexOf(':');
-  
-  if (colidx != -1) {
-    start_time.hour = time_str.substring(0, colidx).toInt();
-    start_time.minute = time_str.substring(colidx + 1).toInt();
-  }
-  return start_time;
-}
-
-String timeinfo_t_to_str(timeinfo_t start_time)
-{
-  String time_str;
-  if (start_time.hour < 10) {
-    time_str = "0" + String(start_time.hour);
-  } else {
-    time_str = String(start_time.hour);
-  }
-  time_str += ":";
-  if (start_time.minute < 10) {
-    time_str += "0" + String(start_time.minute);
-  } else {
-    time_str += String(start_time.minute);
-  }
-  return time_str;
-}

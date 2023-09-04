@@ -87,7 +87,9 @@ int get_now_scheduled_valve(void)
       }
     }
   }
-  settings_enable_cycle(0, false); // disable manual cycle
+  if (settings_is_cycle_enabled(0)) {
+    settings_enable_cycle(0, false); // disable manual cycle
+  }
   current_cycle = -1;
   return -1;
 }

@@ -312,8 +312,8 @@ void gui_start(void)
     ESPUI.setElementStyle(gui_elements_valve[i].duration_grp, label_style);
     ESPUI.setElementStyle(ESPUI.addControl(Label, "", gettext("minutes"), ControlColor::Peterriver, gui_elements_valve[i].duration_grp), label_style);
     gui_elements_valve[i].duration_ctrl = ESPUI.addControl(Slider, "", "0", ControlColor::None, gui_elements_valve[i].duration_grp, gui_duration_cb, (void*)i);
-    ESPUI.addControl(Min, "", "1", None, gui_elements_valve[i].duration_ctrl);
-    ESPUI.addControl(Max, "", "60", None, gui_elements_valve[i].duration_ctrl);
+    ESPUI.addControl(Min, "", "0", None, gui_elements_valve[i].duration_ctrl);
+    ESPUI.addControl(Max, "", String(VALVE_MAX_OPENED_DURATION), None, gui_elements_valve[i].duration_ctrl);
     
     // manual control
     elt = ESPUI.addControl(Label, gettext("Manual control"), gettext("Force ON"), ControlColor::Peterriver, Control::noParent);

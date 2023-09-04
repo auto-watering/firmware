@@ -123,21 +123,31 @@ uint32_t settings_get_crc(void)
 
 bool settings_get_cycle_start_time(int cycle_id, timeinfo_t *start_time)
 {
+  bool ret;
   if (cycle_id == 0) {
     *start_time = volatile_settings.manual_cycle_start_time;
-    return volatile_settings.manual_cycle_enabled;
+    ret = volatile_settings.manual_cycle_enabled;
   } else if (cycle_id <= CYCLES_NUMBER) {
     *start_time = settings.start_time[cycle_id - 1];
-    return settings.cycle_enabled[cycle_id - 1];
+    ret = settings.cycle_enabled[cycle_id - 1];
   } else {
     start_time->hour = 0;
     start_time->minute = 0;
-    return false;
+    ret = false;
   }
+  if (start_time->hour > 23 || start_time->minute > 59) {
+    start_time->hour = 0;
+    start_time->minute = 0;    
+  }
+  return ret;
 }
 
 void settings_set_cycle_start_time(int cycle_id, timeinfo_t start_time)
 {
+  if (start_time.hour > 23 || start_time.minute > 59) {
+    start_time.hour = 0;
+    start_time.minute = 0;    
+  }
   if (cycle_id == 0) {
     volatile_settings.manual_cycle_start_time = start_time;
   } else if (cycle_id <= CYCLES_NUMBER) {
@@ -167,11 +177,18 @@ bool settings_is_cycle_enabled(int cycle_id)
 
 uint8_t settings_get_valve_duration(uint16_t id)
 {
-  return valve_settings[id].duration;
+  uint16_t duration = valve_settings[id].duration;
+  if (duration > VALVE_MAX_OPENED_DURATION) {
+    duration = VALVE_MAX_OPENED_DURATION;
+  }
+  return duration;
 }
 
 void settings_set_valve_duration(uint16_t id, uint8_t duration)
 {
+  if (duration > VALVE_MAX_OPENED_DURATION) {
+    duration = VALVE_MAX_OPENED_DURATION;
+  }
   valve_settings[id].duration = duration;
 }
 

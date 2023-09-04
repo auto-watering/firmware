@@ -262,7 +262,7 @@ bool mqtt_connect(void)
       topic = String(MQTT_TOPIC_VALVE_DURATION) + String(i);
       name = String(MQTT_TOPIC_NAME_VALVE_DURATION) + String(i);
       mqtt_client.subscribe((topic + MQTT_TOPIC_SET_SUFFIX).c_str());
-      mqtt_publish_discovery_number(topic.c_str(), name.c_str(), 0, 60);
+      mqtt_publish_discovery_number(topic.c_str(), name.c_str(), 0, VALVE_MAX_OPENED_DURATION);
     }
     return true;
   } else {

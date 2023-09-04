@@ -47,6 +47,9 @@ int VALVE_GPIO[VALVE_NUMBER] = {
   // 23 // valve 6
 };
 
+// Maximum duration opened
+#define VALVE_MAX_OPENED_DURATION 60
+
 /*
  * Watering settings
  */

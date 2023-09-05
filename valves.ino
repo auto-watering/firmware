@@ -130,6 +130,13 @@ bool *get_valves_state(void)
   return valves_state;
 }
 
+void get_valves_state(bool states[VALVE_NUMBER])
+{
+  for (int i = 0; i < VALVE_NUMBER; i++) {
+    states[i] = valves_state[i];
+  }
+}
+
 int get_current_cycle(void)
 {
   if (settings_get_general_force_off()) {

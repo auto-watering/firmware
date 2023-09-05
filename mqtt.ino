@@ -33,9 +33,11 @@ typedef struct mqtt_published_data_s {
   bool general_force_off;
   timeinfo_t cycle_start_time[CYCLES_NUMBER + 1];
   bool cycle_enabled[CYCLES_NUMBER + 1];
+  int current_cycle;
   uint16_t valve_duration[VALVE_NUMBER];
   bool valve_force_on[VALVE_NUMBER];
   bool valve_force_off[VALVE_NUMBER];
+  bool valves_state[VALVE_NUMBER];
 } mqtt_published_data_t;
 mqtt_published_data_t mqtt_published_data;
 
@@ -55,6 +57,8 @@ mqtt_published_data_t mqtt_published_data;
 #define MQTT_TOPIC_VALVE_FORCE_ON MQTT_DEVICE_NAME "/" MQTT_TOPIC_NAME_VALVE_FORCE_ON
 #define MQTT_TOPIC_NAME_VALVE_DURATION "duration_valve"
 #define MQTT_TOPIC_VALVE_DURATION MQTT_DEVICE_NAME "/" MQTT_TOPIC_NAME_VALVE_DURATION
+#define MQTT_TOPIC_NAME_VALVE_STATE "state_valve"
+#define MQTT_TOPIC_VALVE_STATE MQTT_DEVICE_NAME "/" MQTT_TOPIC_NAME_VALVE_STATE
 #define MQTT_TOPIC_SET_SUFFIX "/set"
 
 void mqtt_publish_discovery_binary(const char *topic, const char *name)
@@ -148,13 +152,13 @@ void mqtt_publish_data(String topic, String payload)
   Serial.println("Published MQTT update on " + topic + ": " + payload);
 }
 
-void mqtt_publish(bool force = false)
+void mqtt_publish_settings(bool force = false)
 {
   String topic;
   String payload;
-  mqtt_published_data_t new_published_data;
+  mqtt_published_data_t new_published_data = mqtt_published_data;
 
-  // Load new data
+  // Load new settings
   new_published_data.general_force_off = settings_get_general_force_off();
   for (int i = 0; i <= CYCLES_NUMBER; i++) {
     new_published_data.cycle_enabled[i] = settings_get_cycle_start_time(i, &(new_published_data.cycle_start_time[i]));
@@ -217,6 +221,38 @@ void mqtt_publish(bool force = false)
   mqtt_published_data = new_published_data;
 }
 
+void mqtt_publish_status(bool force = false)
+{
+  String topic;
+  String payload;
+  mqtt_published_data_t new_published_data = mqtt_published_data;
+
+  // Get new status
+  new_published_data.current_cycle = get_current_cycle();
+  get_valves_state(new_published_data.valves_state);
+
+  // Publish changes
+  // Cycles status
+  for (int i = 0; i <= CYCLES_NUMBER; i++) {
+    if (force || mqtt_published_data.current_cycle != new_published_data.current_cycle) {
+      topic = String(MQTT_TOPIC_CYCLE_STATUS) + String(i);
+      payload = String(i == new_published_data.current_cycle);
+      mqtt_publish_data(topic, payload);
+    }
+  }
+  // Valves states
+  for (int i = 0; i < VALVE_NUMBER; i++) {
+    if (force || mqtt_published_data.valves_state[i] != new_published_data.valves_state[i]) {
+      topic = String(MQTT_TOPIC_VALVE_STATE) + String(i);
+      payload = String(new_published_data.valves_state[i]);
+      mqtt_publish_data(topic, payload);
+    }
+  }
+
+  // Update published data cache
+  mqtt_published_data = new_published_data;
+}
+
 bool mqtt_connect(void)
 {
   if (mqtt_client.connect(MQTT_DEVICE_NAME, MQTT_USER, MQTT_PASSWORD)) {
@@ -263,6 +299,10 @@ bool mqtt_connect(void)
       name = String(MQTT_TOPIC_NAME_VALVE_DURATION) + String(i);
       mqtt_client.subscribe((topic + MQTT_TOPIC_SET_SUFFIX).c_str());
       mqtt_publish_discovery_number(topic.c_str(), name.c_str(), 0, VALVE_MAX_OPENED_DURATION);
+      // state
+      topic = String(MQTT_TOPIC_VALVE_STATE) + String(i);
+      name = String(MQTT_TOPIC_NAME_VALVE_STATE) + String(i);
+      mqtt_publish_discovery_binary(topic.c_str(), name.c_str());
     }
     return true;
   } else {
@@ -277,7 +317,8 @@ void mqtt_start(void)
   Serial.print("Connecting to MQTT broker... ");
   if (mqtt_connect()) {
     Serial.println("connected");
-    mqtt_publish(true);
+    mqtt_publish_settings(true);
+    mqtt_publish_status(true);
   } else {
     Serial.print("failed, rc=");
     Serial.println(mqtt_client.state());
@@ -292,12 +333,11 @@ void mqtt_refresh(void)
   }
   mqtt_client.loop();
 
-  // Publish changes on settings
+  // Publish changes on settings and status
   if (settings_changed(&mqtt_settings_crc)) {
-    mqtt_publish();
+    mqtt_publish_settings();
   }
-  // TODO : status
-  // TODO : manual cycle
+  mqtt_publish_status();
 }
 
 #endif

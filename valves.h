@@ -40,6 +40,12 @@ void valves_update(void);
 bool *get_valves_state(void);
 
 /**
+ * Get current valves states.
+ * @param[out] valves states array, must be pre-allocated for VALVE_NUMBER entries.
+ */
+void get_valves_state(bool states[VALVE_NUMBER]);
+
+/**
  * Get current watering cycle.
  * @return cycle ID, or -1 if none currently active.
  */

@@ -131,7 +131,6 @@ void gui_force_on(int id, bool enable)
   ESPUI.updateControlValue(gui_elements_valve[id].force_on_ctrl, String(enable));
   ESPUI.updateControlValue(gui_elements_valve[id].force_off_ctrl, "0");
   settings_set_valve_force_on(id, enable);
-  settings_set_valve_force_off(id, false);
 }
 
 void gui_force_off(int id, bool enable)
@@ -140,7 +139,6 @@ void gui_force_off(int id, bool enable)
   ESPUI.updateControlValue(gui_elements_valve[id].force_off_ctrl, String(enable));
   ESPUI.updateControlValue(gui_elements_valve[id].force_on_ctrl, "0");
   settings_set_valve_force_off(id, enable);
-  settings_set_valve_force_on(id, false);
 }
 
 void gui_force_on_cb(Control *sender, int type, void* user_data)

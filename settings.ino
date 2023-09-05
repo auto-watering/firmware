@@ -210,6 +210,9 @@ bool settings_get_valve_force_on(uint16_t id)
 void settings_set_valve_force_on(uint16_t id, bool enable)
 {
   valve_settings[id].force_on = enable;
+  if (enable) {
+    valve_settings[id].force_off = false;
+  }
 }
 
 bool settings_get_valve_force_off(uint16_t id)
@@ -220,4 +223,7 @@ bool settings_get_valve_force_off(uint16_t id)
 void settings_set_valve_force_off(uint16_t id, bool enable)
 {
   valve_settings[id].force_off = enable;
+  if (enable) {
+    valve_settings[id].force_on = false;
+  }
 }

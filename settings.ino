@@ -41,13 +41,17 @@ typedef struct volatile_settings_s {
 } volatile_settings_t;
 volatile_settings_t volatile_settings;
 
-uint32_t settings_crc;
+uint32_t settings_crc; // only for persistent settings
+uint32_t all_settings_crc; // for persistent and volatile settings
 
-uint32_t settings_compute_crc(void)
+uint32_t settings_compute_crc(bool include_volatile = false)
 {
   CRC32 crc;
   crc.update(reinterpret_cast<const uint8_t*>(&settings), sizeof(settings));
   crc.update(reinterpret_cast<const uint8_t*>(&valve_settings), sizeof(valve_settings));
+  if (include_volatile) {
+    crc.update(reinterpret_cast<const uint8_t*>(&volatile_settings), sizeof(volatile_settings));
+  }
   return crc.finalize();
 }
 
@@ -80,6 +84,7 @@ void settings_load(void)
       valve_settings[i].force_on = false;
     }
   }
+  memset(&volatile_settings, 0x00, sizeof(volatile_settings));
 }
 
 void settings_store(void)
@@ -107,7 +112,7 @@ bool settings_changed(void)
 bool settings_changed(uint32_t *crc)
 {
   bool ret = false;
-  uint32_t current_crc = settings_compute_crc();
+  uint32_t current_crc = settings_compute_crc(true);
   if (*crc != current_crc) {
     ret = true;
   }
@@ -117,7 +122,7 @@ bool settings_changed(uint32_t *crc)
 
 uint32_t settings_get_crc(void)
 {
-  settings_compute_crc();
+  settings_compute_crc(true);
   return settings_crc;
 }
 

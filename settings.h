@@ -34,12 +34,14 @@ void settings_store(void);
 
 /**
  * Check if settings have changed since last call to settings_store().
+ * Only settings stored persistently are taken into account.
  * @return false if settings are unchanged.
  */
 bool settings_changed(void);
 
 /**
  * Check if settings have changed according to given CRC.
+ * Persistent and volatile settings are taken into account.
  * @param[in/out] CRC, which is updated on return with the current one.
  * @return false if settings are unchanged.
  */
@@ -47,6 +49,7 @@ bool settings_changed(uint32_t *crc);
 
 /**
  * Get current settings CRC.
+ * Persistent and volatile settings are taken into account for this CRC.
  * @return Settings CRC.
  */
 uint32_t settings_get_crc(void);

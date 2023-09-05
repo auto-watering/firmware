@@ -20,6 +20,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include <ESPUI.h>
 #include "config.h"
 #include "i18n.h"
+#include "timedate.h"
+#include "settings.h"
+#include "valves.h"
 
 typedef struct gui_elements_valve_s {
   String valve_str;
@@ -44,18 +47,24 @@ gui_elements_t gui_elements;
 
 uint32_t gui_settings_crc;
 
-void gui_status_change(int id, bool status)
+int last_current_cycle = -1;
+
+void gui_status_change(bool valves_state[VALVE_NUMBER])
 {
   int current_cycle;
-  
-  if (status) {
-    ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Emerald;
-    ESPUI.updateControlValue(gui_elements_valve[id].status_label, gettext("ON"));
-  } else {
-    ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Alizarin;
-    ESPUI.updateControlValue(gui_elements_valve[id].status_label, gettext("OFF"));
+
+  // Valves states
+  for (int id = 0; id < VALVE_NUMBER; id++) {
+    if (valves_state[id]) {
+      ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Emerald;
+      ESPUI.updateControlValue(gui_elements_valve[id].status_label, gettext("ON"));
+    } else {
+      ESPUI.getControl(gui_elements_valve[id].status_label)->color = ControlColor::Alizarin;
+      ESPUI.updateControlValue(gui_elements_valve[id].status_label, gettext("OFF"));
+    }
   }
-  
+
+  // Current cycle
   current_cycle = get_current_cycle();
   if (current_cycle != -1) {
     ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Emerald;
@@ -68,8 +77,12 @@ void gui_status_change(int id, bool status)
     ESPUI.getControl(gui_elements.status_label)->color = ControlColor::Alizarin;
     gui_elements.status_str = gettext("No active cycle");
   }
+  if (last_current_cycle == 0 && current_cycle != 0) {
+    // end of manual cycle
+    ESPUI.updateControlValue(gui_elements.manuel_cycle_enable_ctrl, String(0));
+  }
   ESPUI.updateControlValue(gui_elements.status_label, gui_elements.status_str);
-
+  last_current_cycle = current_cycle;
 }
 
 void gui_start_time_cb(Control *sender, int type, void* user_data)
@@ -207,6 +220,10 @@ void gui_sync_settings(bool force = false)
     ESPUI.updateControlValue(gui_elements.start_time_ctrl[i - 1], value);
     ESPUI.setEnabled(gui_elements.start_time_ctrl[i - 1], cycle_enabled);
   }
+  // manual cycle (cycle 0)
+  // (manual cycle is disabled automatically when it ends)
+  enabled = settings_is_cycle_enabled(0);
+  ESPUI.updateControlValue(gui_elements.manuel_cycle_enable_ctrl, String(enabled));
 
   // Manual general control
   value = String(settings_get_general_force_off());
@@ -228,8 +245,11 @@ void gui_sync_settings(bool force = false)
   }
 }
 
-void gui_refresh(String date, bool valves_state[VALVE_NUMBER])
-{ 
+void gui_refresh()
+{
+  String date = time_get_formatted();
+  bool *valves_state = get_valves_state();
+
   // Date
   gui_set_date(date);
 
@@ -237,13 +257,7 @@ void gui_refresh(String date, bool valves_state[VALVE_NUMBER])
   gui_sync_settings();
 
   // Status
-  for (int i = 0; i < VALVE_NUMBER; i++) {
-    gui_status_change(i, valves_state[i]);
-  }
-
-  // Manual cycle is disabled automatically when it ends
-  bool enabled = settings_is_cycle_enabled(0);
-  ESPUI.updateControlValue(gui_elements.manuel_cycle_enable_ctrl, String(enabled));
+  gui_status_change(valves_state);
 }
 
 void gui_newline(uint16_t parent)

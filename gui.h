@@ -28,9 +28,7 @@ void gui_start(void);
 
 /*
  * Refresh GUI display.
- * @param[in] human readable date string, as returned by time_get_formatted() from timedate.h.
- * @param[in] valves states array (true: open, false: closed), this array can be retrieved using get_valves_state() from vales.h.
  */
-void gui_refresh(String date, bool valves_state[]);
+void gui_refresh();
 
 #endif

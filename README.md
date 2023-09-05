@@ -8,3 +8,7 @@ Required librairies:
 - CRC32
 - PubSubClient (only if you plan to use MQTT client)
 
+Use `config.h.example` to set your `config.h` file.
+
+If using MQTT with HomeAssistant, an example dashboard code for two cycles and two valves is provided in `HomeAssistant-dashboard-example.yaml`.
+

@@ -1,0 +1,97 @@
+views:
+  - title: Cycles
+    icon: mdi:clock-outline
+    badges: []
+    cards:
+      - type: entities
+        entities:
+          - entity: switch.arrosage_enabled_cycle1
+            name: Activé
+            icon: mdi:play-pause
+          - entity: binary_sensor.arrosage_status_cycle1
+            name: Statut
+            icon: mdi:information
+            secondary_info: last-updated
+            state_color: true
+          - entity: number.arrosage_hour_cycle1
+            name: Heure
+            icon: mdi:clock
+          - entity: number.arrosage_minute_cycle1
+            name: Minute
+            icon: mdi:clock
+        title: Cycle 1
+      - type: entities
+        entities:
+          - entity: switch.arrosage_enabled_cycle2
+            name: Activé
+            icon: mdi:play-pause
+          - entity: binary_sensor.arrosage_status_cycle2
+            name: Statut
+            icon: mdi:information
+            secondary_info: last-updated
+            state_color: true
+          - entity: number.arrosage_hour_cycle2
+            name: Heure
+            icon: mdi:clock
+          - entity: number.arrosage_minute_cycle2
+            name: Minute
+            icon: mdi:clock
+        title: Cycle 2
+      - type: entities
+        entities:
+          - entity: switch.arrosage_enabled_cycle0
+            name: Activé
+            icon: mdi:play-pause
+          - entity: binary_sensor.arrosage_status_cycle0
+            name: Statut
+            icon: mdi:information
+            secondary_info: last-updated
+            state_color: true
+        title: Cycle manuel
+      - type: entities
+        entities:
+          - entity: switch.arrosage_force_off
+            name: Arrêt forcé
+            icon: mdi:pause
+  - title: Vannes
+    path: vannes
+    icon: mdi:pipe-valve
+    badges: []
+    cards:
+      - type: entities
+        entities:
+          - entity: number.arrosage_duration_valve0
+            name: Durée
+            icon: mdi:timer
+          - entity: switch.arrosage_force_off_valve0
+            name: Arrêt forcé
+            icon: mdi:pause
+          - entity: switch.arrosage_force_on_valve0
+            name: Marche forcée
+            icon: mdi:play
+          - entity: binary_sensor.arrosage_state_valve0
+            name: État
+            icon: mdi:information
+            secondary_info: last-updated
+            state_color: true
+        title: Vanne 1
+        show_header_toggle: false
+      - type: entities
+        entities:
+          - entity: number.arrosage_duration_valve1
+            name: Durée
+            icon: mdi:timer
+          - entity: switch.arrosage_force_off_valve1
+            name: Arrêt forcé
+            icon: mdi:pause
+          - entity: switch.arrosage_force_on_valve1
+            name: Marche forcée
+            icon: mdi:play
+          - entity: binary_sensor.arrosage_state_valve1
+            icon: mdi:information
+            name: État
+            secondary_info: last-updated
+            state_color: true
+        title: Vanne 2
+        show_header_toggle: false
+

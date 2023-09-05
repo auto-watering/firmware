@@ -340,7 +340,8 @@ void gui_start(void)
     gui_elements_valve[i].status_label = ESPUI.addControl(Label, gettext("Status"), gettext("OFF"), ControlColor::Alizarin, Control::noParent);
     ESPUI.setElementStyle(gui_elements_valve[i].status_label, label_style);
   }
-  
+
+  ESPUI.sliderContinuous = true;
   ESPUI.begin(gettext("Automatic watering"));
 
   gui_sync_settings(true);

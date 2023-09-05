@@ -51,5 +51,5 @@ void loop() {
     settings_store();
   }
   wdt_notify();
-  delay(10);
+  delay(100);
 }

@@ -11,6 +11,8 @@ cp *.ino dist
 cp ChangeLog dist
 cp AUTHOR LICENSE dist
 cp config.h.example dist
+cp HomeAssistant-dashboard-example.yaml dist
+cp README.md dist
 
 rm dist/config.h
 

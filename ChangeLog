@@ -1,3 +1,14 @@
+1.2.0 - 09/06/2023
+- MQTT client implemented, to psuh settings and states, and to subscribe on
+external settings changes, tested with HomeAssistant Mosquitto Broker in order
+to have an alternative GUI to configure wattering
+- GUI: use sliders for valves open duration
+- Improve data checking
+- Bugfix: do not change valves force OFF value when settings general force OFF
+- GUI: start valves indexes from 1 instead of 0
+- Add an example config file
+- MQTT: add HomeAssistant example dashboard
+
 1.1.2 - 08/19/2023
 - Reconnect WiFi in case of connection lost
 - Use hardware watch dog timer to recover in case of crash

@@ -9,7 +9,8 @@ Use `config.h.example` to set your `config.h` file with the right options for
 you.
 
 If using MQTT with HomeAssistant, an example dashboard code for two cycles and
-two valves is provided in `HomeAssistant-dashboard-example.yaml`.
+two valves is provided in `HomeAssistant-dashboard-example.yaml`. You will have
+to enable `USE_MQTT` and set `MQTT*` options in your `config.h`.
 
 ## Arduino IDE
 
@@ -39,4 +40,5 @@ To connect to serial console, you can use picocom:
 ```
 picocom -b 115200 /dev/ttyUSB0
 ```
-
+(use `CTRL+A-X` to exit).
+From there you can see the device IP address and log messages.

@@ -13,6 +13,8 @@ cp AUTHOR LICENSE dist
 cp config.h.example dist
 cp HomeAssistant-dashboard-example.yaml dist
 cp README.md dist
+cp platformio.ini dist
+cp dist.sh dist
 
 rm dist/config.h
 

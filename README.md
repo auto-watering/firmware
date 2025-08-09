@@ -1,5 +1,11 @@
 # Auto Watering
 
+This is the project firmware for ESP32, it has been tested on ESP32 DevKit C
+board.
+
+The auto watering scheduling is done through a web user interface.
+![Web GUI](screenshots/web_gui.webp)
+
 Below are detailed two methods to work on this project:
 - Arduino IDE
 - PlatformIO
@@ -11,6 +17,10 @@ you.
 If using MQTT with HomeAssistant, an example dashboard code for two cycles and
 two valves is provided in `HomeAssistant-dashboard-example.yaml`. You will have
 to enable `USE_MQTT` and set `MQTT*` options in your `config.h`.
+
+![Scheduling through HomeAssistant](screenshots/ha_scheduling.webp)
+
+![Managing valves through HomeAssistant](screenshots/ha_valves.webp)
 
 ## Arduino IDE
 

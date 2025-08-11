@@ -1,7 +1,9 @@
-# Auto Watering
+# Auto Watering firmware
 
 This is the project firmware for ESP32, it has been tested on ESP32 DevKit C
 board.
+
+You can find the PCB details on [its dedicated repository](https://github.com/auto-watering/pcb).
 
 The auto watering scheduling is done through a web user interface.
 ![Web GUI](screenshots/web_gui.webp)
